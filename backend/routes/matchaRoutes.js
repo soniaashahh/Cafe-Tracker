@@ -1,7 +1,11 @@
 import express from 'express';
 import { MatchaSpot } from '../models/matchaModel.js';
+import { authenticateToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
+
+// All routes require authentication
+router.use(authenticateToken);
 
 // CREATE
 router.post('/', async (req, res) => {
@@ -17,6 +21,7 @@ router.post('/', async (req, res) => {
       location,
       signatureDrink,
       rating: Number(rating),
+      userId: req.user._id,
     });
     return res.status(201).send(spot);
   } catch (e) {
@@ -25,10 +30,10 @@ router.post('/', async (req, res) => {
   }
 });
 
-// READ ALL
-router.get('/', async (_req, res) => {
+// READ ALL (only user's spots)
+router.get('/', async (req, res) => {
   try {
-    const spots = await MatchaSpot.find({});
+    const spots = await MatchaSpot.find({ userId: req.user._id });
     res.status(200).json({ count: spots.length, data: spots });
   } catch (e) {
     console.log(e.message);
@@ -36,10 +41,13 @@ router.get('/', async (_req, res) => {
   }
 });
 
-// READ ONE
+// READ ONE (only if belongs to user)
 router.get('/:id', async (req, res) => {
   try {
-    const spot = await MatchaSpot.findById(req.params.id);
+    const spot = await MatchaSpot.findOne({ _id: req.params.id, userId: req.user._id });
+    if (!spot) {
+      return res.status(404).json({ message: 'Spot not found' });
+    }
     res.status(200).json(spot);
   } catch (e) {
     console.log(e.message);
@@ -47,7 +55,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// UPDATE
+// UPDATE (only if belongs to user)
 router.put('/:id', async (req, res) => {
   try {
     const { name, location, signatureDrink, rating } = req.body;
@@ -56,22 +64,23 @@ router.put('/:id', async (req, res) => {
         message: 'Send all required fields: name, location, signatureDrink, rating (1–5)',
       });
     }
-    const updated = await MatchaSpot.findByIdAndUpdate(
-      req.params.id,
-      { name, location, signatureDrink, rating: Number(rating) }
+    const updated = await MatchaSpot.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user._id },
+      { name, location, signatureDrink, rating: Number(rating) },
+      { new: true }
     );
     if (!updated) return res.status(404).json({ message: 'Spot not found' });
-    res.status(200).send({ message: 'Spot updated successfully' });
+    res.status(200).send({ message: 'Spot updated successfully', spot: updated });
   } catch (e) {
     console.log(e.message);
     res.status(500).send({ message: e.message });
   }
 });
 
-// DELETE
+// DELETE (only if belongs to user)
 router.delete('/:id', async (req, res) => {
   try {
-    const deleted = await MatchaSpot.findByIdAndDelete(req.params.id);
+    const deleted = await MatchaSpot.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
     if (!deleted) return res.status(404).json({ message: 'Spot not found' });
     res.status(200).send({ message: 'Spot deleted successfully' });
   } catch (e) {

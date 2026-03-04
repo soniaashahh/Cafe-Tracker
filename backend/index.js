@@ -4,6 +4,7 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import spotsRoute from './routes/matchaRoutes.js';
+import authRoute from './routes/authRoutes.js';
 import { PORT as CFG_PORT, mongoDBURL } from './config.js';
 
 dotenv.config();
@@ -34,6 +35,7 @@ app.get('/', (_req, res) => {
 });
 
 // routes
+app.use('/auth', authRoute);
 app.use('/spots', spotsRoute);
 
 // ----- db connect + retry -----

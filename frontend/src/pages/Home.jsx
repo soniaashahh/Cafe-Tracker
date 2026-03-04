@@ -2,8 +2,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Spinner from '../components/Spinner';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { MdAdd } from 'react-icons/md';
+import { useAuth } from '../context/AuthContext';
+import { useSnackbar } from 'notistack';
 import SpotsTable from '../components/home/SpotTable';
 import SpotsCard from '../components/home/SpotCard';
 
@@ -12,6 +14,15 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showType, setShowType] = useState('table');
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
+
+  const handleLogout = () => {
+    logout();
+    enqueueSnackbar('Logged out successfully', { variant: 'success' });
+    navigate('/login');
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -22,7 +33,12 @@ const Home = () => {
         setSpots(res?.data?.data ?? []);
       } catch (e) {
         console.log(e);
-        setError('Failed to load spots');
+        if (e.response?.status === 401) {
+          // Token expired or invalid, logout will be handled by interceptor
+          setError('Session expired. Please login again.');
+        } else {
+          setError('Failed to load spots');
+        }
       } finally {
         setLoading(false);
       }
@@ -33,13 +49,28 @@ const Home = () => {
   return (
     <div className="px-6 py-10">
       {/* Page header */}
-      <div className="max-w-5xl mx-auto mb-6">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-[#265b37] tracking-tight">
-          Cafe Spots
-        </h1>
-        <p className="mt-1 text-sm text-[#2d6a4f]/70">
-          Your matcha & coffee adventure tracker
-        </p>
+      <div className="max-w-5xl mx-auto mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#265b37] tracking-tight">
+            Cafe Spots
+          </h1>
+          <p className="mt-1 text-sm text-[#2d6a4f]/70">
+            Your matcha & coffee adventure tracker
+          </p>
+        </div>
+        <div className="flex items-center gap-4">
+          {user && (
+            <span className="text-sm text-[#2d6a4f]">
+              Welcome, {user.name}
+            </span>
+          )}
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 text-sm text-white bg-[#265b37] hover:bg-[#1b4332] rounded-md transition"
+          >
+            Logout
+          </button>
+        </div>
       </div>
 
       {/* Toggle + Add */}
