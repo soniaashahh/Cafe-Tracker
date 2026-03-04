@@ -14,7 +14,7 @@ const DeleteSpot = () => {
   const handleDeleteSpot = async () => {
     try {
       setLoading(true);
-      await axios.delete(`http://localhost:5555/spots/${id}`);
+      await axios.delete(`http://localhost:3000/spots/${id}`);
       enqueueSnackbar('Spot deleted successfully', { variant: 'success' });
       navigate('/');
     } catch (error) {

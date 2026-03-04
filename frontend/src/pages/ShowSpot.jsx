@@ -13,7 +13,7 @@ const ShowSpot = () => {
     const load = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`http://localhost:5555/spots/${id}`);
+        const res = await axios.get(`http://localhost:3000/spots/${id}`);
         setSpot(res.data);
       } catch (err) {
         console.log(err);

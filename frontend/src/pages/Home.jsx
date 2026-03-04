@@ -18,7 +18,7 @@ const Home = () => {
       try {
         setLoading(true);
         setError('');
-        const res = await axios.get('http://localhost:5555/spots');
+        const res = await axios.get('http://localhost:3000/spots');
         setSpots(res?.data?.data ?? []);
       } catch (e) {
         console.log(e);

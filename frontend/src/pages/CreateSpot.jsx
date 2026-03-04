@@ -25,7 +25,7 @@ const CreateSpot = () => {
 
     setLoading(true);
     try {
-      await axios.post('http://localhost:5555/spots', data);
+      await axios.post('http://localhost:3000/spots', data);
       enqueueSnackbar('Spot created successfully', { variant: 'success' });
       navigate('/');
     } catch (error) {

@@ -19,7 +19,7 @@ const EditSpot = () => {
   useEffect(() => {
     setLoading(true);
     axios
-      .get(`http://localhost:5555/spots/${id}`)
+      .get(`http://localhost:3000/spots/${id}`)
       .then((res) => {
         setName(res.data.name || '');
         setLocation(res.data.location || '');
@@ -44,7 +44,7 @@ const EditSpot = () => {
 
     setLoading(true);
     axios
-      .put(`http://localhost:5555/spots/${id}`, data)
+      .put(`http://localhost:3000/spots/${id}`, data)
       .then(() => {
         setLoading(false);
         enqueueSnackbar('Spot updated successfully', { variant: 'success' });
