@@ -8,7 +8,7 @@ Try the app here:
 
 https://cafe-tracker-ysnq.vercel.app
 
-## ⚙️ Tech Stack
+## Tech Stack
 
 Frontend
 - React (Vite)
