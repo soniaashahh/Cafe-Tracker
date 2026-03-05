@@ -65,37 +65,31 @@ const Signup = () => {
 
     setGoogleLoading(true);
     
-    // Use OAuth2 flow to get access token
-    const tokenClient = window.google.accounts.oauth2.initTokenClient({
+    // Initialize and trigger Google Sign-In with ID token flow
+    window.google.accounts.id.initialize({
       client_id: clientId,
-      scope: 'openid email profile',
-      callback: async (tokenResponse) => {
-        if (tokenResponse.error) {
+      callback: async (response) => {
+        try {
+          // response.credential is the ID token
+          const result = await loginWithGoogle(response.credential);
           setGoogleLoading(false);
-          enqueueSnackbar('Google sign-in was cancelled or failed', { variant: 'error' });
-          return;
-        }
-
-        if (tokenResponse.access_token) {
-          try {
-            const result = await loginWithGoogle(tokenResponse.access_token);
-            setGoogleLoading(false);
-            
-            if (result.success) {
-              enqueueSnackbar('Google signup successful!', { variant: 'success' });
-              navigate('/');
-            } else {
-              enqueueSnackbar(result.message || 'Google signup failed', { variant: 'error' });
-            }
-          } catch (error) {
-            setGoogleLoading(false);
-            enqueueSnackbar('Google signup failed', { variant: 'error' });
+          
+          if (result.success) {
+            enqueueSnackbar('Google signup successful!', { variant: 'success' });
+            navigate('/');
+          } else {
+            enqueueSnackbar(result.message || 'Google signup failed', { variant: 'error' });
           }
+        } catch (error) {
+          setGoogleLoading(false);
+          console.error('Google signup error:', error);
+          enqueueSnackbar('Google signup failed', { variant: 'error' });
         }
       },
     });
 
-    tokenClient.requestAccessToken();
+    // Trigger the sign-in popup
+    window.google.accounts.id.prompt();
   };
 
   return (

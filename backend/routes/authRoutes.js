@@ -160,9 +160,11 @@ router.post("/google", async (req, res) => {
         name = userInfo.name;
       } catch (accessTokenError) {
         console.log("Google OAuth error:", accessTokenError.message);
+        console.log("Full error:", accessTokenError);
         return res.status(401).json({
           message: "Invalid Google token",
           error: accessTokenError.message,
+          details: accessTokenError.stack,
         });
       }
     }
