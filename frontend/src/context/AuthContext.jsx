@@ -112,11 +112,30 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const loginWithGoogle = async (googleToken) => {
+    try {
+      const response = await axios.post('http://localhost:3000/auth/google', {
+        token: googleToken,
+      });
+      const { token: newToken, user: userData } = response.data;
+      setToken(newToken);
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Google login failed',
+      };
+    }
+  };
+
   const value = {
     user,
     token,
     login,
     signup,
+    loginWithGoogle,
     logout,
     loading,
     isAuthenticated: !!token,

@@ -1,8 +1,10 @@
 import express from "express";
 import jwt from "jsonwebtoken";
+import { OAuth2Client } from "google-auth-library";
 import { User } from "../models/userModel.js";
 
 const router = express.Router();
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Sign up
 router.post("/signup", async (req, res) => {
@@ -112,6 +114,106 @@ router.post("/login", async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: error.message });
+  }
+});
+
+// Google OAuth Login
+router.post("/google", async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({
+        message: "Google token is required",
+      });
+    }
+
+    let payload;
+    let googleId;
+    let email;
+    let name;
+
+    try {
+      // Try to verify as ID token first
+      const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      payload = ticket.getPayload();
+      googleId = payload.sub;
+      email = payload.email;
+      name = payload.name;
+    } catch (idTokenError) {
+      // If ID token verification fails, try as access token
+      try {
+        const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (!userInfoResponse.ok) {
+          throw new Error('Failed to fetch user info from Google');
+        }
+        
+        const userInfo = await userInfoResponse.json();
+        googleId = userInfo.id;
+        email = userInfo.email;
+        name = userInfo.name;
+      } catch (accessTokenError) {
+        console.log("Google OAuth error:", accessTokenError.message);
+        return res.status(401).json({
+          message: "Invalid Google token",
+          error: accessTokenError.message,
+        });
+      }
+    }
+
+    if (!email) {
+      return res.status(400).json({
+        message: "Email not provided by Google",
+      });
+    }
+
+    // Check if user exists with this email
+    let user = await User.findOne({ email });
+
+    if (user) {
+      // User exists - update googleId if not set
+      if (!user.googleId && googleId) {
+        user.googleId = googleId;
+        await user.save();
+      }
+    } else {
+      // Create new user
+      user = await User.create({
+        name: name || email.split("@")[0],
+        email,
+        googleId,
+        // password is not required for OAuth users
+      });
+    }
+
+    // Generate JWT token
+    const jwtToken = jwt.sign(
+      { userId: user._id, email: user.email },
+      process.env.JWT_SECRET || "your-secret-key",
+      { expiresIn: "7d" }
+    );
+
+    res.status(200).json({
+      message: "Google login successful",
+      token: jwtToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.log("Google OAuth error:", error.message);
+    res.status(401).json({
+      message: "Invalid Google token",
+      error: error.message,
+    });
   }
 });
 
