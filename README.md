@@ -1,3 +1,35 @@
+Cafe Spots is a full-stack web application that allows users to track and rate their favorite matcha and coffee shops. Users can create an account, log in with Google or email authentication, and manage their personal list of cafés.
+
+The app allows users to add cafés, store their location and signature drink, give ratings, and edit or delete entries.
+
+## Live Deployment
+
+Try the app here:
+
+https://cafe-tracker-ysnq.vercel.app
+
+## ⚙️ Tech Stack
+
+Frontend
+- React (Vite)
+- Tailwind CSS
+- React Router
+
+Backend
+- Node.js
+- Express
+
+Database
+- MongoDB (MongoDB Atlas)
+
+Authentication
+- JWT Authentication
+- Google OAuth
+
+Deployment
+- Vercel (Frontend)
+- Render (Backend)
+
 ## Running the Project Locally
 
 ### 1. Clone the Repository
