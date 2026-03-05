@@ -4,6 +4,7 @@ import Spinner from '../components/Spinner';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
+import { API_URL } from '../config/api.js';
 
 const DeleteSpot = () => {
   const [loading, setLoading] = useState(false);
@@ -14,7 +15,7 @@ const DeleteSpot = () => {
   const handleDeleteSpot = async () => {
     try {
       setLoading(true);
-      await axios.delete(`http://localhost:3000/spots/${id}`);
+      await axios.delete(`${API_URL}/spots/${id}`);
       enqueueSnackbar('Spot deleted successfully', { variant: 'success' });
       navigate('/');
     } catch (error) {

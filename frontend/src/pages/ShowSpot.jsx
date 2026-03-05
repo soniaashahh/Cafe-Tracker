@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import BackButton from '../components/BackButton';
 import Spinner from '../components/Spinner';
+import { API_URL } from '../config/api.js';
 
 const ShowSpot = () => {
   const [spot, setSpot] = useState(null);
@@ -13,7 +14,7 @@ const ShowSpot = () => {
     const load = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`http://localhost:3000/spots/${id}`);
+        const res = await axios.get(`${API_URL}/spots/${id}`);
         setSpot(res.data);
       } catch (err) {
         console.log(err);

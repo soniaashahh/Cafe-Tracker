@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import axios from 'axios';
+import { API_URL } from '../config/api.js';
 
 const AuthContext = createContext();
 
@@ -74,7 +75,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('http://localhost:3000/auth/login', {
+      const response = await axios.post(`${API_URL}/auth/login`, {
         email,
         password,
       });
@@ -93,7 +94,7 @@ export const AuthProvider = ({ children }) => {
 
   const signup = async (name, email, password, confirmPassword) => {
     try {
-      const response = await axios.post('http://localhost:3000/auth/signup', {
+      const response = await axios.post(`${API_URL}/auth/signup`, {
         name,
         email,
         password,
@@ -114,7 +115,7 @@ export const AuthProvider = ({ children }) => {
 
   const loginWithGoogle = async (googleToken) => {
     try {
-      const response = await axios.post('http://localhost:3000/auth/google', {
+      const response = await axios.post(`${API_URL}/auth/google`, {
         token: googleToken,
       });
       const { token: newToken, user: userData } = response.data;

@@ -4,6 +4,7 @@ import Spinner from '../components/Spinner';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
+import { API_URL } from '../config/api.js';
 
 const CreateSpot = () => {
   const [name, setName] = useState('');
@@ -25,7 +26,7 @@ const CreateSpot = () => {
 
     setLoading(true);
     try {
-      await axios.post('http://localhost:3000/spots', data);
+      await axios.post(`${API_URL}/spots`, data);
       enqueueSnackbar('Spot created successfully', { variant: 'success' });
       navigate('/');
     } catch (error) {

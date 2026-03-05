@@ -4,6 +4,7 @@ import Spinner from '../components/Spinner';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
+import { API_URL } from '../config/api.js';
 
 const EditSpot = () => {
   const [name, setName] = useState('');
@@ -19,7 +20,7 @@ const EditSpot = () => {
   useEffect(() => {
     setLoading(true);
     axios
-      .get(`http://localhost:3000/spots/${id}`)
+      .get(`${API_URL}/spots/${id}`)
       .then((res) => {
         setName(res.data.name || '');
         setLocation(res.data.location || '');
@@ -44,7 +45,7 @@ const EditSpot = () => {
 
     setLoading(true);
     axios
-      .put(`http://localhost:3000/spots/${id}`, data)
+      .put(`${API_URL}/spots/${id}`, data)
       .then(() => {
         setLoading(false);
         enqueueSnackbar('Spot updated successfully', { variant: 'success' });

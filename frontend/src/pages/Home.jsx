@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { useSnackbar } from 'notistack';
 import SpotsTable from '../components/home/SpotTable';
 import SpotsCard from '../components/home/SpotCard';
+import { API_URL } from '../config/api.js';
 
 const Home = () => {
   const [spots, setSpots] = useState([]);
@@ -29,7 +30,7 @@ const Home = () => {
       try {
         setLoading(true);
         setError('');
-        const res = await axios.get('http://localhost:3000/spots');
+        const res = await axios.get(`${API_URL}/spots`);
         setSpots(res?.data?.data ?? []);
       } catch (e) {
         console.log(e);
